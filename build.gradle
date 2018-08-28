@@ -10,6 +10,8 @@ ext {
     scalaMinorVersion = '6'
     scalatestVersion = '3.0.5'
     scalaVersion = "$scalaBinaryVersion.$scalaMinorVersion"
+
+    vertxVersion = '3.5.3'
 }
 
 sourceCompatibility = 1.8
@@ -28,4 +30,7 @@ dependencies {
     implementation "org.scalatest:scalatest:$scalatestVersion"
 
     implementation 'junit:junit:4.12'
+
+    implementation "io.vertx:vertx-lang-scala_2.12:$vertxVersion"
+
 }
