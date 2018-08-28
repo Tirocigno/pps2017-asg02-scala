@@ -1,15 +1,31 @@
 plugins {
     id 'java'
+    id 'scala'
+    id 'idea'
 }
 
-version '1.0-SNAPSHOT'
+/*Qui ci vanno le variabili globali*/
+ext {
+    scalaBinaryVersion = '2.12'
+    scalaMinorVersion = '6'
+    scalatestVersion = '3.0.5'
+    scalaVersion = "$scalaBinaryVersion.$scalaMinorVersion"
+}
 
 sourceCompatibility = 1.8
 
+/*Repositories da cui aggiungere le librerie*/
 repositories {
+    mavenLocal()
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+
+    implementation "org.scala-lang:scala-library:$scalaVersion"
+
+    implementation "org.scalatest:scalatest:$scalatestVersion"
+
+    implementation 'junit:junit:4.12'
 }
