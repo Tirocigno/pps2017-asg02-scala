@@ -1,5 +1,6 @@
 package VertxLoader
 
+import io.vertx.core.{AsyncResult, Handler, Vertx}
 
 
 trait VertxFile {
@@ -37,10 +38,18 @@ object VertxFile {
   }
 
   private class VertxFolder(override val filePath: String, val nestingLevel:Int) extends VertxFile {
+
+
+    val handler:Handler[AsyncResult[List[String]]] = (result:AsyncResult[List[String]]) => result match {
+      case AsyncResult if result.succeeded() => result.result().foreach(path => VertxFile(path, nestingLevel -1).get.openFile)
+      case _ => result.cause()
+    }
+
     override def openFile(): Unit = {
-      io.vertx.scala.core.Future
+      Vertx.vertx.fileSystem.readDir(filePath, handler)
 
     }
+
   }
 
 }
