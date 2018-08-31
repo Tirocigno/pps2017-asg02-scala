@@ -21,6 +21,8 @@ object VertxFile {
 
   private[this] val noNesting = 0
 
+  val loader:Vertx = Vertx.vertx()
+
   import java.io._
 
 
@@ -65,7 +67,7 @@ object VertxFile {
     *
     * @param filePath the path of the file to open.
     */
-  private class VertxDocument(override val filePath: String) extends VertxFile {
+  private[VertxLoader] class VertxDocument(override val filePath: String) extends VertxFile {
     override def computeFile(): Unit = ???
   }
 
@@ -74,17 +76,19 @@ object VertxFile {
     *
     * @param filePath the path of the file to open.
     */
-  private class VertxFolder(override val filePath: String, val nestingLevel: Int) extends VertxFile {
+  private[VertxLoader] class VertxFolder(override val filePath: String, val nestingLevel: Int) extends VertxFile {
+
 
     private[this]val handler = (result: AsyncResult[java.util.List[String]]) => result match {
-      case result: AsyncResult[java.util.List[String]] if result.succeeded() => {
-        result.result().forEach(path => VertxFile(path, nestingLevel - 1).get.computeFile())
+      case result: AsyncResult[java.util.List[String]] if result.succeeded() && nestingLevel >= 0 => {
+        result.result().forEach(path => {println(path);VertxFile(path, nestingLevel - 1).get.computeFile()})
       }
-      case _ => print(result.cause())
+      case result: AsyncResult[java.util.List[String]] if result.succeeded() && nestingLevel < 0 =>
+      case _ => println(result.cause())
     }
 
     override def computeFile(): Unit = {
-      Vertx.vertx.fileSystem.readDir(filePath, handler)
+      loader.fileSystem.readDir(filePath, handler)
     }
   }
 
