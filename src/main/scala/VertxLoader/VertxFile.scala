@@ -77,13 +77,14 @@ object VertxFile {
   private class VertxFolder(override val filePath: String, val nestingLevel: Int) extends VertxFile {
 
     private[this]val handler = (result: AsyncResult[java.util.List[String]]) => result match {
-      case result: AsyncResult[java.util.List[String]] if result.succeeded() => result.result().forEach(path => VertxFile(path, nestingLevel - 1).get.computeFile())
+      case result: AsyncResult[java.util.List[String]] if result.succeeded() => {
+        result.result().forEach(path => VertxFile(path, nestingLevel - 1).get.computeFile())
+      }
       case _ => print(result.cause())
     }
 
     override def computeFile(): Unit = {
       Vertx.vertx.fileSystem.readDir(filePath, handler)
-
     }
   }
 
