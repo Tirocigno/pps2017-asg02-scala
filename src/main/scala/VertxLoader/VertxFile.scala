@@ -67,6 +67,7 @@ object VertxFile {
     * @param filePath the path of the file to open.
     */
   private[VertxLoader] class VertxDocument(override val filePath: String) extends VertxFile {
+    // TODO implement this method
     override def computeFile(): Unit = ???
   }
 
@@ -94,10 +95,8 @@ object VertxFile {
       case result: AsyncResult[java.util.List[String]] if result.succeeded() && nestingLevel > 0 =>
         result.result().forEach(path => VertxFile(path, nestingLevel - 1).get.computeFile())
 
-      case result: AsyncResult[java.util.List[String]] if result.succeeded() => {
-
+      case result: AsyncResult[java.util.List[String]] if result.succeeded() =>
         result.result().asScala.toStream.map(mapToVertxFile).filter(filterDocument).foreach(f => f.computeFile())
-      }
       case _ => println(result.cause())
     }
 
