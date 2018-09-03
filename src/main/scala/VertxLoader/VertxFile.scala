@@ -61,9 +61,9 @@ object VertxFile {
     }
   }
 
-
   /**
     * This class represent a document to compute.
+    * Package private for test purpose.
     *
     * @param filePath the path of the file to open.
     */
@@ -73,17 +73,21 @@ object VertxFile {
 
   /**
     * This class represent a folder to compute.
+    * Package private for test purpose.
     *
     * @param filePath the path of the file to open.
     */
   private[VertxLoader] class VertxFolder(override val filePath: String, val nestingLevel: Int) extends VertxFile {
 
+    private[this] val filterDocument: VertxFile => Boolean = (file:VertxFile) => file.isInstanceOf[VertxDocument]
 
     private[this]val handler = (result: AsyncResult[java.util.List[String]]) => result match {
-      case result: AsyncResult[java.util.List[String]] if result.succeeded() && nestingLevel >= 0 => {
-        result.result().forEach(path => {println(path);VertxFile(path, nestingLevel - 1).get.computeFile()})
-      }
-      case result: AsyncResult[java.util.List[String]] if result.succeeded() && nestingLevel < 0 =>
+
+      case result: AsyncResult[java.util.List[String]] if result.succeeded() && nestingLevel > 0 =>
+        result.result().forEach(path => VertxFile(path, nestingLevel - 1).get.computeFile())
+
+      case result: AsyncResult[java.util.List[String]] if result.succeeded() =>
+        result.result().stream().map(filePath => VertxFile(filePath).get).filter(filterDocument).forEach(document => document.computeFile())
       case _ => println(result.cause())
     }
 

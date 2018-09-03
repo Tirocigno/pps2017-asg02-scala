@@ -13,6 +13,9 @@ class VertxFileTest extends FunSuite {
 
   def complexNestingLevel = 2
 
+  def defaultElse:()=>VertxFile = () => {fail(); VertxFile(defaultResourcesPath).get}
+
+
   test("Non existing folder scan result in None") {
     val filePath = defaultResourcesPath + "/canides"
     assert(VertxFile(filePath) isEmpty)
@@ -25,12 +28,12 @@ class VertxFileTest extends FunSuite {
 
   test("File instantiation") {
     val filePath = defaultResourcesPath +  "/cat.txt"
-    assert(VertxFile(filePath).getOrElse(() => {fail(); VertxFile(defaultResourcesPath)}).isInstanceOf[VertxFile.VertxDocument])
+    assert(VertxFile(filePath).getOrElse(defaultElse).isInstanceOf[VertxFile.VertxDocument])
   }
 
   test("Folder instantiaton") {
     val filePath = defaultResourcesPath +  "/felides"
-    assert(VertxFile(filePath).getOrElse(() => {fail(); VertxFile(defaultResourcesPath)}).isInstanceOf[VertxFile.VertxFolder])
+    assert(VertxFile(filePath).getOrElse(defaultElse).isInstanceOf[VertxFile.VertxFolder])
   }
 
 }

@@ -1,3 +1,5 @@
+import java.util.function.Predicate
+
 package object VertxLoader {
 
   import io.vertx.core._
@@ -10,6 +12,8 @@ package object VertxLoader {
     * @tparam A the input data type of the handler.
     * @return an Handler object.
     */
-  implicit def functionToHandler[A](f: A => Unit): Handler[A] = (event: A) => {f(event)}
+  implicit def functionToHandler[A](f: A => Unit): Handler[A] = (event: A) =>  f(event)
+
+  implicit def functionToPredicate[A](predicate: A => Boolean): Predicate[A] = (condition: A) => predicate(condition)
 
 }
