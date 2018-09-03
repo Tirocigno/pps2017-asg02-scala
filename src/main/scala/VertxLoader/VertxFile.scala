@@ -16,7 +16,7 @@ trait VertxFile {
 }
 
 /**
-  * Companion Object for the trait VertxFile.
+  * Companion Object fhor the trait VertxFile.
   */
 object VertxFile {
 
