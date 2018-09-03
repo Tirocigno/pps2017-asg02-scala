@@ -10,7 +10,7 @@ trait VertxFile {
   def filePath: String
 
   /**
-    * Open the file at a specified path and process it.
+    * Open the fifle at a specified path and process it.
     */
   def computeFile(): Unit
 }
