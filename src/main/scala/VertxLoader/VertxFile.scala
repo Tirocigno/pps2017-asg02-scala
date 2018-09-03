@@ -2,6 +2,7 @@ package VertxLoader
 
 import io.vertx.core.{AsyncResult, Vertx}
 
+
 /**
   * Trait to describe a generic VertxFile.
   */
@@ -19,12 +20,10 @@ trait VertxFile {
   */
 object VertxFile {
 
+  val loader: Vertx = Vertx.vertx()
   private[this] val noNesting = 0
 
-  val loader:Vertx = Vertx.vertx()
-
   import java.io._
-
 
   /**
     * Apply method for build a VertxFile object without a nesting level specified.
@@ -79,15 +78,26 @@ object VertxFile {
     */
   private[VertxLoader] class VertxFolder(override val filePath: String, val nestingLevel: Int) extends VertxFile {
 
-    private[this] val filterDocument: VertxFile => Boolean = (file:VertxFile) => file.isInstanceOf[VertxDocument]
+    /**
+      * Import used to convert Java collection into scala ones.
+      */
 
-    private[this]val handler = (result: AsyncResult[java.util.List[String]]) => result match {
+    import scala.collection.JavaConverters._
+
+
+    private[this] val filterDocument: VertxFile => Boolean = (file: VertxFile) => file.isInstanceOf[VertxDocument]
+
+    private[this] val mapToVertxFile: String => VertxFile = (filePath: String) => VertxFile(filePath).get
+
+    private[this] val handler = (result: AsyncResult[java.util.List[String]]) => result match {
 
       case result: AsyncResult[java.util.List[String]] if result.succeeded() && nestingLevel > 0 =>
         result.result().forEach(path => VertxFile(path, nestingLevel - 1).get.computeFile())
 
-      case result: AsyncResult[java.util.List[String]] if result.succeeded() =>
-        result.result().stream().map(filePath => VertxFile(filePath).get).filter(filterDocument).forEach(document => document.computeFile())
+      case result: AsyncResult[java.util.List[String]] if result.succeeded() => {
+
+        result.result().asScala.toStream.map(mapToVertxFile).filter(filterDocument).foreach(f => f.computeFile())
+      }
       case _ => println(result.cause())
     }
 

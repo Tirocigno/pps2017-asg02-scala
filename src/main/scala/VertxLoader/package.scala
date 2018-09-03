@@ -4,16 +4,27 @@ package object VertxLoader {
 
   import io.vertx.core._
 
+  import scala.language.implicitConversions
+
   /**
-    * This implicit function handles allows function defined by scala syntax to be passed as handler for
-    * a asynchronous computation.
+    * Convert a scala method to a java Handler.
     *
     * @param f the function to use as handler.
     * @tparam A the input data type of the handler.
     * @return an Handler object.
     */
-  implicit def functionToHandler[A](f: A => Unit): Handler[A] = (event: A) =>  f(event)
+  implicit def functionToHandler[A](f: A => Unit): Handler[A] = (event: A) => f(event)
 
+  /**
+    * Convert a scala method to a java Predicate.
+    *
+    * @param predicate the function to use as predicate.
+    * @tparam A the input data type of the predicate.
+    * @return a Predicate object.
+    */
   implicit def functionToPredicate[A](predicate: A => Boolean): Predicate[A] = (condition: A) => predicate(condition)
 
+  //implicit def functionToMapper[_>:String,_<:VertxFile](convert:String => VertxFile): java.util.function.Function[String,VertxFile] = (input: String) => convert(input)
+
+  implicit def functionToMapper[A, B](apply: A => B): java.util.function.Function[A, B] = (input: A) => apply(input)
 }

@@ -7,13 +7,15 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class VertxFileTest extends FunSuite {
 
-  def defaultResourcesPath = "src/test/resources"
-
   def defaultNestingLevel = 0
 
   def complexNestingLevel = 2
 
-  def defaultElse:()=>VertxFile = () => {fail(); VertxFile(defaultResourcesPath).get}
+  def defaultElse: () => VertxFile = () => {
+    fail(); VertxFile(defaultResourcesPath).get
+  }
+
+  def defaultResourcesPath = "src/test/resources"
 
 
   test("Non existing folder scan result in None") {
@@ -27,12 +29,12 @@ class VertxFileTest extends FunSuite {
   }
 
   test("File instantiation") {
-    val filePath = defaultResourcesPath +  "/cat.txt"
+    val filePath = defaultResourcesPath + "/cat.txt"
     assert(VertxFile(filePath).getOrElse(defaultElse).isInstanceOf[VertxFile.VertxDocument])
   }
 
   test("Folder instantiaton") {
-    val filePath = defaultResourcesPath +  "/felides"
+    val filePath = defaultResourcesPath + "/felides"
     assert(VertxFile(filePath).getOrElse(defaultElse).isInstanceOf[VertxFile.VertxFolder])
   }
 
