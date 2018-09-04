@@ -1,9 +1,9 @@
 package VertxLoader
 
-import io.vertx.core.{AsyncResult, Vertx}
+import io.vertx.scala.core.Vertx
+import io.vertx.scala.core.file.FileSystem
 
-import scala.concurrent.Future
-import scala.util.{Failure, Success}
+import scala.concurrent.{Future, Promise}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
@@ -49,8 +49,14 @@ object VertxFile {
     }
   }
 
-  private[this] def buildFileList(filePath:String, nestingLevel:Int):Future[List[VertxFile]] = ???
+  private def getFolderDocuments(folderPath:VertxFolder):Future[List[VertxFile]] = loader.fileSystem()
+    .readDirFuture(folderPath.filePath).map(buffer => buffer.toStream.map(s => VertxFile(s).get).toList)
 
+  private[this] def buildFileList(root:String, nestingLevel:Int):Future[List[VertxFile]] = VertxFile(root).get match {
+      case document: VertxDocument =>  Future{List(document)}
+      case folder:VertxFolder if nestingLevel == 0 => getFolderDocuments(folder)
+      case _ => Promise.failed(new IllegalStateException("Error in opening "+root)).future
+  }
   def scanAndApply[A](filePath:String, nestingLevel:Int, strategy: List[VertxFile] => A):Future[A] =
     buildFileList(filePath, nestingLevel).map(strategy)
 
@@ -60,7 +66,7 @@ object VertxFile {
     *
     * @param filePath the path of the file to open.
     */
-  private[VertxLoader] case class VertxDocument(override val filePath: String) extends VertxFile
+  case class VertxDocument(override val filePath: String) extends VertxFile
 
   /**
     * This class represent a folder to compute.
