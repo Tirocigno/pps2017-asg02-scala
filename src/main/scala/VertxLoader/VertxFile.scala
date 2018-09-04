@@ -6,13 +6,8 @@ import io.vertx.core.{AsyncResult, Vertx}
 /**
   * Trait to describe a generic VertxFile.
   */
-trait VertxFile {
+sealed trait VertxFile {
   def filePath: String
-
-  /**
-    * Open the fifle at a specified path and process it.
-    */
-  def computeFile(): Unit
 }
 
 /**
@@ -66,10 +61,7 @@ object VertxFile {
     *
     * @param filePath the path of the file to open.
     */
-  private[VertxLoader] class VertxDocument(override val filePath: String) extends VertxFile {
-    // TODO implement this method
-    override def computeFile(): Unit = ???
-  }
+  private[VertxLoader] case class VertxDocument(override val filePath: String) extends VertxFile
 
   /**
     * This class represent a folder to compute.
@@ -77,7 +69,7 @@ object VertxFile {
     *
     * @param filePath the path of the file to open.
     */
-  private[VertxLoader] class VertxFolder(override val filePath: String, val nestingLevel: Int) extends VertxFile {
+  private[VertxLoader] case class VertxFolder(override val filePath: String, val nestingLevel: Int) extends VertxFile/* {
 
     /**
       * Import used to convert Java collection into scala ones.
@@ -103,7 +95,7 @@ object VertxFile {
     override def computeFile(): Unit = {
       loader.fileSystem.readDir(filePath, handler)
     }
-  }
+  }*/
 
 }
 
