@@ -7,6 +7,7 @@ import scala.concurrent.{Future, Promise}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
+
 /**
   * Trait to describe a generic VertxFile.
   */
@@ -49,12 +50,20 @@ object VertxFile {
     }
   }
 
+
+  //TODO How implement this shit.
+  private def getSubFolderDocuments(filePath:String, nestingLevel:Int):Future[List[VertxFile]] = ???
+
+
+
+
   private def getFolderDocuments(folderPath:VertxFolder):Future[List[VertxFile]] = loader.fileSystem()
     .readDirFuture(folderPath.filePath).map(buffer => buffer.toStream.map(s => VertxFile(s).get).toList)
 
   private[this] def buildFileList(root:String, nestingLevel:Int):Future[List[VertxFile]] = VertxFile(root).get match {
       case document: VertxDocument =>  Future{List(document)}
       case folder:VertxFolder if nestingLevel == 0 => getFolderDocuments(folder)
+      case folder: VertxFolder if nestingLevel > 0 => getSubFolderDocuments(root, nestingLevel)
       case _ => Promise.failed(new IllegalStateException("Error in opening "+root)).future
   }
   def scanAndApply[A](filePath:String, nestingLevel:Int, strategy: List[VertxFile] => A):Future[A] =
