@@ -2,6 +2,10 @@ package VertxLoader
 
 import io.vertx.core.{AsyncResult, Vertx}
 
+import scala.concurrent.Future
+import scala.util.{Failure, Success}
+import scala.concurrent.ExecutionContext.Implicits.global
+
 
 /**
   * Trait to describe a generic VertxFile.
@@ -15,29 +19,19 @@ sealed trait VertxFile {
   */
 object VertxFile {
 
-  val loader: Vertx = Vertx.vertx()
-  private[this] val noNesting = 0
-
+  private[this] val loader: Vertx = Vertx.vertx()
   import java.io._
 
-  /**
-    * Apply method for build a VertxFile object without a nesting level specified.
-    *
-    * @param filePath the path of the file to open
-    * @return a Optional containing a object a VertxFile if the file exists, None otherwise.
-    */
-  def apply(filePath: String): Option[VertxFile] = this (filePath, noNesting)
 
   /**
     * Apply method for building a vertxfile with a specified nestingLevel
     *
     * @param filePath     the path of the file to open
-    * @param nestingLevel nesting level to reach in subfolders(used if the file is a folder)
     * @return a Optional containing a object a VertxFile if the file exists, None otherwise.
     */
-  def apply(filePath: String, nestingLevel: Int): Option[VertxFile] = filePath match {
-    case VertxFile(file) if file.isDirectory => Some(new VertxFolder(filePath, nestingLevel))
-    case VertxFile(file) => Some(new VertxDocument(filePath))
+  def apply(filePath: String): Option[VertxFile] = filePath match {
+    case VertxFile(file) if file.isDirectory => Some(VertxFolder(filePath))
+    case VertxFile(file) => Some(VertxDocument(filePath))
     case _ => None
   }
 
@@ -55,6 +49,11 @@ object VertxFile {
     }
   }
 
+  private[this] def buildFileList(filePath:String, nestingLevel:Int):Future[List[VertxFile]] = ???
+
+  def scanAndApply[A](filePath:String, nestingLevel:Int, strategy: List[VertxFile] => A):Future[A] =
+    buildFileList(filePath, nestingLevel).map(strategy)
+
   /**
     * This class represent a document to compute.
     * Package private for test purpose.
@@ -69,7 +68,7 @@ object VertxFile {
     *
     * @param filePath the path of the file to open.
     */
-  private[VertxLoader] case class VertxFolder(override val filePath: String, val nestingLevel: Int) extends VertxFile/* {
+  private[VertxLoader] case class VertxFolder(override val filePath: String) extends VertxFile/* {
 
     /**
       * Import used to convert Java collection into scala ones.
