@@ -6,7 +6,7 @@ import org.scalatest._
 import org.scalatest.junit.JUnitRunner
 
 import scala.concurrent.Await
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration._
 
 
 @RunWith(classOf[JUnitRunner])
@@ -15,6 +15,8 @@ class VertxFileTest extends FunSuite {
   def defaultNestingLevel = 0
 
   def complexNestingLevel = 2
+
+  def maxDuration = 100 millis
 
   def defaultElse: () => VertxFile = () => {
     fail(); VertxFile(defaultResourcesPath).get
@@ -45,8 +47,14 @@ class VertxFileTest extends FunSuite {
 
   test("Folder scanning with nesting level equals to zero") {
     val strategy: List[VertxFile] => Int = list => list count(file => file.isInstanceOf[VertxDocument])
+    val future = VertxFile.scanAndApply(defaultResourcesPath, defaultNestingLevel, strategy)
+    assert(Await.result(future, maxDuration) == 1)
+  }
+
+  test("Folder scanning with nesting level equals to two") {
+    val strategy: List[VertxFile] => Int = list => list count (file => file.isInstanceOf[VertxDocument])
     val future = VertxFile.scanAndApply(defaultResourcesPath, complexNestingLevel, strategy)
-    assert(Await.ready(future, Duration.Inf).value.get.get == 1)
+    assert(Await.result(future, maxDuration) == 3)
   }
 
 }
