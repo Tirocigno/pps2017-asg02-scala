@@ -52,7 +52,15 @@ object VertxFile {
 
 
   //TODO How implement this shit.
-  private def getSubFolderDocuments(filePath:String, nestingLevel:Int):Future[List[VertxFile]] = ???
+  private def getSubFolderDocuments(filePath:String, nestingLevel:Int):Future[List[VertxFile]] =
+    loader.fileSystem()
+      .readDirFuture(filePath)
+      .map(buffer => buffer.toStream)
+      .map(s => Future.sequence(s.map(path => buildFileList(path, nestingLevel-1))))
+      .flatten
+      .map(s => s.flatten.toList)
+
+
 
 
 
