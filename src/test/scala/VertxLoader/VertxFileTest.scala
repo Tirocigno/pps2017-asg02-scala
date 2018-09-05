@@ -1,8 +1,13 @@
 package VertxLoader
 
+import VertxLoader.VertxFile.VertxDocument
 import org.junit.runner.RunWith
 import org.scalatest._
 import org.scalatest.junit.JUnitRunner
+
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
+
 
 @RunWith(classOf[JUnitRunner])
 class VertxFileTest extends FunSuite {
@@ -36,6 +41,12 @@ class VertxFileTest extends FunSuite {
   test("Folder instantiaton") {
     val filePath = defaultResourcesPath + "/felides"
     assert(VertxFile(filePath).getOrElse(defaultElse).isInstanceOf[VertxFile.VertxFolder])
+  }
+
+  test("Folder scanning with nesting level equals to zero") {
+    val strategy: List[VertxFile] => Int = list => list count(file => file.isInstanceOf[VertxDocument])
+    val future = VertxFile.scanAndApply(defaultResourcesPath, complexNestingLevel, strategy)
+    assert(Await.ready(future, Duration.Inf).value.get.get == 1)
   }
 
 }

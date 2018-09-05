@@ -1,7 +1,7 @@
 package VertxLoader
 
 import io.vertx.scala.core.Vertx
-import io.vertx.scala.core.file.FileSystem
+
 
 import scala.concurrent.{Future, Promise}
 import scala.concurrent.ExecutionContext.Implicits.global

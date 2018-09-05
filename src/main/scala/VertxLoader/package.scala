@@ -24,7 +24,4 @@ package object VertxLoader {
     */
   implicit def functionToPredicate[A](predicate: A => Boolean): Predicate[A] = (condition: A) => predicate(condition)
 
-  //implicit def functionToMapper[_>:String,_<:VertxFile](convert:String => VertxFile): java.util.function.Function[String,VertxFile] = (input: String) => convert(input)
-
-  implicit def functionToMapper[A, B](apply: A => B): java.util.function.Function[A, B] = (input: A) => apply(input)
 }
