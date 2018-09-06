@@ -28,5 +28,11 @@ object StatisticsStorage {
     */
   def getTotalMatching(): Long = scannedFileMap.filter(_._2 > 0).values sum
 
+  /**
+    * Retrieve the mean number of matching.
+    *
+    * @return an integer with the percentage value
+    */
+  def meanNumberOfMatching(): Int = (getNumberOfFileMatching() / scannedFileMap.keys.size) * 100
 
 }
