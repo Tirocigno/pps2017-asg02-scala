@@ -3,9 +3,11 @@ import java.util.function.Predicate
 import VertxLoader.VertxFile.VertxDocument
 import io.vertx.core.Handler
 
+import scala.concurrent.Future
+
 package object VertxLoader {
 
-  import io.vertx.scala.core._
+  import io.vertx.scala.core.Vertx
 
   import scala.concurrent.ExecutionContext.Implicits.global
   import scala.language.implicitConversions
@@ -34,8 +36,8 @@ package object VertxLoader {
     * @param document the VertxDocument to open.
     * @return a future containing the content of the document.
     */
-  def loadVertxFile(document: VertxDocument) = {
+  def readVertxFile(document: VertxDocument): Future[String] =
     Vertx.vertx().fileSystem().readFileFuture(document.filePath) map (_.toString)
-  }
+
 
 }
