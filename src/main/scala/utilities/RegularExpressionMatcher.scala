@@ -10,13 +10,15 @@ import scala.util.{Failure, Success}
 
 object RegularExpressionMatcher {
 
+
   def matchRegularExpression(fileList: List[VertxFile], regularExpression: String): Unit =
     fileList.filter(_.isInstanceOf[VertxDocument]).map(_.asInstanceOf[VertxDocument]) foreach (d => readVertxFile(d)
       .map(_.words)
+      //TODO make this generic working.
       .map(_.filter(checkRegExp(_, regularExpression.r)))
       .map(_.size)
       .onComplete({
-        case Success(occurences) => addFile(d.filePath, occurences)
+        case Success(occurrences) => addFile(d.filePath, occurrences)
         case Failure(exception) => throw new IllegalStateException(exception)
       }))
 
