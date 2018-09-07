@@ -24,4 +24,5 @@ package object VertxLoader {
     */
   implicit def functionToPredicate[A](predicate: A => Boolean): Predicate[A] = (condition: A) => predicate(condition)
 
+
 }
