@@ -14,7 +14,6 @@ object RegularExpressionMatcher {
   def matchRegularExpression(fileList: List[VertxFile], regularExpression: String): Unit =
     fileList.filter(_.isInstanceOf[VertxDocument]).map(_.asInstanceOf[VertxDocument]) foreach (d => readVertxFile(d)
       .map(_.words)
-      //TODO make this generic working.
       .map(_.filter(checkRegExp(_, regularExpression.r)))
       .map(_.size)
       .onComplete({
@@ -26,7 +25,7 @@ object RegularExpressionMatcher {
     def words(): Iterable[String] = text.split("\\W+").toIterable
   }
 
-  implicit def checkRegExp(word: String, regExp: Regex): Boolean = word match {
+  def checkRegExp(word: String, regExp: Regex): Boolean = word match {
     case regExp(_) => true
     case _ => false
   }
