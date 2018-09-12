@@ -13,7 +13,7 @@ object RegularExpressionMatcher {
 
   def matchRegularExpression(fileList: List[VertxFile], regularExpression: String): Unit =
     fileList.filter(_.isInstanceOf[VertxDocument]).map(_.asInstanceOf[VertxDocument]) foreach (d => readVertxFile(d)
-      .map(_.words)
+      .map(_.words())
       .map(_.filter(checkRegExp(_, regularExpression.r)))
       .map(_.size)
       .onComplete({

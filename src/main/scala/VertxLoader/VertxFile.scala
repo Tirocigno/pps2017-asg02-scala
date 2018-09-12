@@ -33,7 +33,7 @@ object VertxFile {
     */
   def apply(filePath: String): Option[VertxFile] = filePath match {
     case VertxFile(file) if file.isDirectory => Some(VertxFolder(filePath))
-    case VertxFile(file) => Some(VertxDocument(filePath))
+    case VertxFile(_) => Some(VertxDocument(filePath))
     case _ => None
   }
 
@@ -68,7 +68,7 @@ object VertxFile {
       List(document)
     }
     case folder: VertxFolder if nestingLevel == 0 => getFolderDocuments(folder)
-    case folder: VertxFolder if nestingLevel > 0 => getSubFolderDocuments(root, nestingLevel)
+    case _: VertxFolder if nestingLevel > 0 => getSubFolderDocuments(root, nestingLevel)
     case _ => Promise.failed(new IllegalStateException("Error in opening " + root)).future
   }
 

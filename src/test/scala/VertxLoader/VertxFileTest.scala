@@ -16,7 +16,7 @@ class VertxFileTest extends FunSuite {
 
   def complexNestingLevel = 2
 
-  def maxDuration = 100 millis
+  def maxDuration: FiniteDuration = 100 millis
 
   def defaultElse: () => VertxFile = () => {
     fail(); VertxFile(defaultResourcesPath).get
